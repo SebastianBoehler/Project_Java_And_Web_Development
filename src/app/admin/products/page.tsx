@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import DeleteProductButton from "@/components/admin/DeleteProductButton";
 import { getProducts } from "@/hooks/ssr_hooks";
+import CartButton from "@/components/CartButton";
 
 export default async function ProductsAdminPage() {
   // Fetch products using server-side function
@@ -19,6 +20,8 @@ export default async function ProductsAdminPage() {
           Create New Product
         </Link>
       </div>
+
+      <CartButton cartItemCount={0} />
 
       {products.length === 0 ? (
         <div className="text-center py-10 bg-gray-50 rounded-md">
