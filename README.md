@@ -1,6 +1,6 @@
 # E-Commerce Site with Admin Panel
 
-This is my e-commerce project for the "Project: Java and Web Development" course. Built with Next.js and featuring a full admin panel to manage products, orders, and users.
+This is my e-commerce project for the "Project: Java and Web Development" course. Built with Next.js and featuring a full admin panel to manage products.
 
 ## What's in the box
 
