@@ -1,5 +1,7 @@
 "use server";
 
+import { CartItem } from "@/types";
+
 /**
  * Get the current shopping cart item count
  */
@@ -12,7 +14,7 @@ export async function getCartItemCount(): Promise<number> {
 /**
  * Get the current shopping cart items
  */
-export async function getCartItems() {
+export async function getCartItems(): Promise<CartItem[]> {
   // Temporary implementation with mock data
   return [
     { id: 1, name: 'Product 1', price: 19.99, quantity: 1 },

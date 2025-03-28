@@ -1,6 +1,8 @@
+'use server';
+
 import Link from 'next/link';
-import { ShoppingCart } from './icons/ShoppingCart';
 import { getCartItemCount } from '@/hooks/ssr_hooks';
+import CartButton from './CartButton';
 
 export default async function Header() {
   // Get cart count from SSR hook
@@ -15,20 +17,8 @@ export default async function Header() {
             Sebastian&apos;s
           </Link>
           
-          {/* Shopping Cart Button */}
-          <Link 
-            href="/cart" 
-            className="relative p-2 text-text-light-primary dark:text-text-dark-primary hover:bg-surface-light dark:hover:bg-surface-dark rounded-full transition-colors"
-            aria-label="Shopping cart"
-          >
-            <ShoppingCart />
-            {/* Cart Count Badge - Using standard Tailwind blue */}
-            {cartItemCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-indigo-600 dark:bg-indigo-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center text-[10px]">
-                {cartItemCount > 99 ? '99+' : cartItemCount}
-              </span>
-            )}
-          </Link>
+          {/* Shopping Cart Button - Client Component */}
+          <CartButton cartItemCount={cartItemCount} />
           
           {/* Navigation Links - Absolutely positioned in center */}
           <nav className="hidden md:block absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
