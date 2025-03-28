@@ -1,6 +1,6 @@
 "use server";
 
-import { CartItem } from "@/types";
+import { CartItem, Product } from "@/types";
 
 /**
  * Get the current shopping cart item count
@@ -25,4 +25,12 @@ export async function getCartItems(): Promise<CartItem[]> {
 export async function isAuthenticated(): Promise<boolean> {
   // Temporary implementation
   return false;
+}
+
+export async function getProducts(): Promise<Product[]> {
+  // Temporary implementation with mock data
+  return [
+    { id: 1, name: 'Product 1', price: 19.99, image: '', description: '', variants: [] },
+    { id: 2, name: 'Product 2', price: 29.99, image: '', description: '', variants: [] },
+  ];
 }

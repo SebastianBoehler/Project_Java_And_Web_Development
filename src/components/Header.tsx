@@ -23,11 +23,11 @@ export default async function Header() {
   };
   
   return (
-    <header className="sticky top-0 z-50 w-full bg-background-light dark:bg-background-dark shadow-md">
+    <header className="sticky top-0 z-50 w-full bg-white/70 dark:bg-gray-900/70 backdrop-blur-md shadow-md">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between relative">
           {/* Shop Name */}
-          <Link href="/" className="text-2xl font-bold text-text-light-primary dark:text-text-dark-primary hover:text-primary-light dark:hover:text-primary-dark transition-colors">
+          <Link href="/" className="text-2xl font-bold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors">
             Sebastian&apos;s
           </Link>
           
@@ -39,16 +39,16 @@ export default async function Header() {
             <div className="flex space-x-6">
               <Link 
                 href="/" 
-                className={`text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary transition-colors ${
-                  isActive('/') ? 'underline underline-offset-4 decoration-2' : ''
+                className={`text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors ${
+                  isActive('/') ? 'underline underline-offset-4 decoration-2 decoration-blue-600 dark:decoration-blue-400' : ''
                 }`}
               >
                 Home
               </Link>
               <Link 
                 href="/products" 
-                className={`text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary transition-colors ${
-                  isActive('/products') ? 'underline underline-offset-4 decoration-2' : ''
+                className={`text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors ${
+                  isActive('/products') ? 'underline underline-offset-4 decoration-2 decoration-blue-600 dark:decoration-blue-400' : ''
                 }`}
               >
                 Products
