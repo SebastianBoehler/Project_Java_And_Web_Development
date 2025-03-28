@@ -68,11 +68,6 @@ export async function emptyCart(sessionId: string) {
   await db.collection('cart').deleteOne({ sessionId });
 }
 
-export async function isAuthenticated(): Promise<boolean> {
-  // Temporary implementation
-  return false;
-}
-
 export async function getProducts(limit?: number): Promise<Product[]> {
   const db = client.db('shop');
 
