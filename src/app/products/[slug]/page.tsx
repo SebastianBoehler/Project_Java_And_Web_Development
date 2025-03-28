@@ -1,19 +1,16 @@
 import { getProductByID } from '@/hooks/ssr_hooks';
-import { headers } from 'next/headers';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import AddToCartButton from '@/components/AddToCartButton';
-
+import { cookies } from 'next/headers'
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const product = await getProductByID(Number(slug))
   console.log({slug, product})
 
-  const headersList = await headers();
-  const cookieHeader = headersList.get('cookie');
-  const cookies = cookieHeader?.split(';')
-  const sessionId = cookies?.find(cookie => cookie.includes('session-id='))?.split('=')[1] || '';
+  const cookieStore = await cookies();
+  const sessionId = cookieStore.get('session-id')?.value || '';
   
   // If product not found, show 404
   if (!product) {

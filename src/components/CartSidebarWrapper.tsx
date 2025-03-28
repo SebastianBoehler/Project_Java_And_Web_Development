@@ -1,13 +1,11 @@
-import { headers } from 'next/headers';
 import { getCartItems } from "@/hooks/ssr_hooks";
 import CartSidebar from "./CartSidebar";
+import { cookies } from 'next/headers'
 
 export default async function CartSidebarWrapper() {
   // Fetch cart items using SSR hook
-  const headersList = await headers();
-  const cookieHeader = headersList.get('cookie');
-  const cookies = cookieHeader?.split(';')
-  const sessionId = cookies?.find(cookie => cookie.includes('session-id='))?.split('=')[1] || '';
+  const cookieStore = await cookies();
+  const sessionId = cookieStore.get('session-id')?.value || '';
   
   const cartItems = await getCartItems(sessionId);
   

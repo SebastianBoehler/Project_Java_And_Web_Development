@@ -4,18 +4,18 @@ import Link from 'next/link';
 import { getCartItemCount } from '@/hooks/ssr_hooks';
 import CartButton from './CartButton';
 import { headers } from 'next/headers';
+import { cookies } from 'next/headers'
 
 export default async function Header() {
   // Get cart count from SSR hook
   
   // Get the current path from headers
+  const cookieStore = await cookies();
   const headersList = await headers();
   const pathname = headersList.get('x-url') || '/';
 
-  // we need the uuid therfore from the cookies header
-  const cookieHeader = headersList.get('cookie');
-  const cookies = cookieHeader?.split(';')
-  const sessionId = cookies?.find(cookie => cookie.includes('session-id='))?.split('=')[1] || '';
+
+  const sessionId = cookieStore.get('session-id')?.value || '';
   const cartItemCount = await getCartItemCount(sessionId);
   console.log('Shopping cart of user', sessionId, 'has', cartItemCount, 'items')
   

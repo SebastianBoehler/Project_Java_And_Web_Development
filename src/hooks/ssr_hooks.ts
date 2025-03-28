@@ -69,6 +69,7 @@ export async function emptyCart(sessionId: string) {
 }
 
 export async function getProducts(limit?: number): Promise<Product[]> {
+  "no cache";
   const db = client.db('shop');
 
   const pipeline: Document[] = [

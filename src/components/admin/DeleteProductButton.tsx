@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { deleteProduct } from "@/hooks/ssr_hooks";
 
 interface DeleteProductButtonProps {
@@ -10,7 +9,6 @@ interface DeleteProductButtonProps {
 
 export default function DeleteProductButton({ productId }: DeleteProductButtonProps) {
   const [isDeleting, setIsDeleting] = useState(false);
-  const router = useRouter();
 
   const handleDelete = async () => {
     if (!confirm("Are you sure you want to delete this product?")) {
@@ -25,8 +23,7 @@ export default function DeleteProductButton({ productId }: DeleteProductButtonPr
       console.log('Deleting product with ID:',productId)
       await deleteProduct(productId)
       
-      alert("Product deleted successfully!");
-      router.refresh(); // Refresh the page to update the product list
+      window.location.reload();
     } catch (error) {
       console.error("Error deleting product:", error);
       alert("Failed to delete product");
