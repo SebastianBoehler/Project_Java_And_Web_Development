@@ -3,6 +3,7 @@
 import { MongoClient } from "mongodb";
 import { Product, ShoppingCart } from "@/types";
 import { Document } from "mongodb";
+import { unstable_noStore as noStore } from 'next/cache';
 
 const client = new MongoClient(process.env.MONGO_URL!);
 await client.connect();
@@ -69,7 +70,8 @@ export async function emptyCart(sessionId: string) {
 }
 
 export async function getProducts(limit?: number): Promise<Product[]> {
-  "no cache";
+  noStore();
+  
   const db = client.db('shop');
 
   const pipeline: Document[] = [
@@ -103,4 +105,3 @@ export async function deleteProduct(id: number): Promise<void> {
   const db = client.db('shop');
   await db.collection('products').deleteOne({ id });
 }
-  
