@@ -70,6 +70,8 @@ export async function emptyCart(sessionId: string) {
 }
 
 export async function getProducts(limit?: number): Promise<Product[]> {
+  // needed since otherwise it would be cached, had this issue of not updating shown products
+  // on /admin/products
   noStore();
   
   const db = client.db('shop');

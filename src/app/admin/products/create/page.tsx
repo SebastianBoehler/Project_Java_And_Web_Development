@@ -74,7 +74,7 @@ export default function CreateProductPage() {
             disabled={isLoading}
           />
           <p className="text-sm text-gray-500 mt-1">
-            Describe the product you want to create. Be as specific or general as you like.
+            Describe the product you want to create
           </p>
         </div>
         

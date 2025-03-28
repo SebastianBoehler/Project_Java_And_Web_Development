@@ -4,6 +4,7 @@ import { useSidebar } from "@/context/SidebarContext";
 import { CartItem } from "@/types";
 import { useEffect, useRef } from "react";
 import EmptyCardButton from "./EmptyCardButton";
+import Link from 'next/link';
 
 interface CartSidebarProps {
   cartItems: CartItem[];
@@ -104,11 +105,12 @@ export default function CartSidebar({ cartItems, sessionId }: CartSidebarProps) 
                 <span className="font-bold">Total:</span>
                 <span className="font-bold">${totalPrice.toFixed(2)}</span>
               </div>
-              <button 
-                className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors"
+              <Link 
+                href="/checkout"
+                className="block w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors text-center"
               >
                 Checkout
-              </button>
+              </Link>
               <p className="text-xs text-center mt-3 text-text-light-secondary dark:text-text-dark-secondary italic">
                 By proceeding to checkout you agree to giving me a good grade
               </p>
