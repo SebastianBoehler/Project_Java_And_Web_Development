@@ -1,55 +1,53 @@
-'use client';
-
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { ShoppingCart } from './icons/ShoppingCart';
+import { getCartItemCount } from '@/hooks/ssr_hooks';
 
-interface HeaderProps {
-  cartItemCount?: number;
-}
-
-export default function Header({ cartItemCount = 0 }: HeaderProps) {
-  const pathname = usePathname();
+export default async function Header() {
+  // Get cart count from SSR hook
+  const cartItemCount = await getCartItemCount();
   
   return (
-    <header className="sticky top-0 z-50 w-full bg-white shadow-md">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        {/* Shop Name */}
-        <Link href="/" className="text-2xl font-bold text-gray-800 hover:text-gray-600 transition-colors">
-          Sebastian&apos;s
-        </Link>
-        
-        {/* Navigation Links - can be expanded later */}
-        <nav className="hidden md:flex items-center justify-center flex-1">
-          <div className="flex space-x-6">
-            <Link 
-              href="/" 
-              className={`text-gray-600 hover:text-gray-900 ${pathname === '/' ? 'font-semibold' : ''}`}
-            >
-              Home
-            </Link>
-            <Link 
-              href="/products" 
-              className={`text-gray-600 hover:text-gray-900 ${pathname === '/products' ? 'font-semibold' : ''}`}
-            >
-              Products
-            </Link>
-          </div>
-        </nav>
-        
-        {/* Shopping Cart Button */}
-        <Link 
-          href="/cart" 
-          className="relative p-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
-          aria-label="Shopping cart"
-        >
-          <ShoppingCart />
-          {cartItemCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-              {cartItemCount > 99 ? '99+' : cartItemCount}
-            </span>
-          )}
-        </Link>
+    <header className="sticky top-0 z-50 w-full bg-background-light dark:bg-background-dark shadow-md">
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex items-center justify-between relative">
+          {/* Shop Name */}
+          <Link href="/" className="text-2xl font-bold text-text-light-primary dark:text-text-dark-primary hover:text-primary-light dark:hover:text-primary-dark transition-colors">
+            Sebastian&apos;s
+          </Link>
+          
+          {/* Shopping Cart Button */}
+          <Link 
+            href="/cart" 
+            className="relative p-2 text-text-light-primary dark:text-text-dark-primary hover:bg-surface-light dark:hover:bg-surface-dark rounded-full transition-colors"
+            aria-label="Shopping cart"
+          >
+            <ShoppingCart />
+            {/* Cart Count Badge - Using standard Tailwind blue */}
+            {cartItemCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-indigo-600 dark:bg-indigo-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center text-[10px]">
+                {cartItemCount > 99 ? '99+' : cartItemCount}
+              </span>
+            )}
+          </Link>
+          
+          {/* Navigation Links - Absolutely positioned in center */}
+          <nav className="hidden md:block absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <div className="flex space-x-6">
+              <Link 
+                href="/" 
+                className="text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary"
+              >
+                Home
+              </Link>
+              <Link 
+                href="/products" 
+                className="text-text-light-secondary dark:text-text-dark-secondary hover:text-text-light-primary dark:hover:text-text-dark-primary"
+              >
+                Products
+              </Link>
+            </div>
+          </nav>
+        </div>
       </div>
     </header>
   );
