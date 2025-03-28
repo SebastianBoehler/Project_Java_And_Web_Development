@@ -1,4 +1,3 @@
-"use client"
 import Image from "next/image";
 import { Product } from "@/types";
 import Link from "next/link";
@@ -32,15 +31,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
           <p className="text-gray-600 mb-4 line-clamp-2">{product.description || "No description available"}</p>
           <div className="flex justify-between items-center">
             <span className="text-xl font-bold text-blue-600">${product.price.toFixed(2)}</span>
-            <button 
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-              onClick={(e) => {
-                e.preventDefault(); // Prevent navigation to product page
-                // Add to cart functionality would go here
-              }}
-            >
-              Add to Cart
-            </button>
           </div>
         </div>
       </div>

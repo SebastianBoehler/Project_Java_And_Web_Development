@@ -7,19 +7,12 @@ import { Product } from "@/types";
 // Initialize OpenAI client
 const openai = new OpenAI();
 
-//Schemas for OPEN AI structured output generation
-const VariantSchema = z.object({
-  id: z.number().describe("A unique identifier for this variant"),
-  name: z.string().describe("The name of this variant (e.g., 'Red', 'Large', etc.)"),
-  price: z.number().describe("The price of this variant, can be different from the base product price"),
-  image: z.string().describe("URL to an image of this specific variant, if available")
-});
+//Schema for OPEN AI structured output generation
 const ProductSchema = z.object({
   title: z.string().describe("A catchy and descriptive product title"),
   description: z.string().describe("A detailed product description highlighting features and benefits"),
   price: z.number().describe("A reasonable price for the product in USD"),
-  imagePrompt: z.string().describe("A detailed prompt for DALL-E to generate a high-quality product image"),
-  variants: z.array(VariantSchema).describe("An array of product variants with different options"),
+  imagePrompt: z.string().describe("A detailed prompt for DALL-E to generate a high-quality product image")
 });
 
 export async function POST(request: NextRequest) {
@@ -84,13 +77,6 @@ export async function POST(request: NextRequest) {
     });
 
     const imageUrl = imageResponse.data[0].url;
-    console.log(imageUrl)
-
-    // Generate a slug from the title
-    const slug = productDetails.title
-      .toLowerCase()
-      .replace(/[^\w\s]/gi, '')
-      .replace(/\s+/g, '-');
 
     // Create the product object
     const newProduct: Product = {
@@ -99,8 +85,6 @@ export async function POST(request: NextRequest) {
       price: productDetails.price,
       image: imageUrl || '',
       description: productDetails.description,
-      slug: slug,
-      variants: productDetails.variants
     };
 
     // In a real application, you would save this to a database

@@ -7,19 +7,24 @@ import { headers } from 'next/headers';
 
 export default async function Header() {
   // Get cart count from SSR hook
-  const cartItemCount = await getCartItemCount();
   
   // Get the current path from headers
   const headersList = await headers();
   const pathname = headersList.get('x-url') || '/';
-  console.log(pathname);
+
+  // we need the uuid therfore from the cookies header
+  const cookieHeader = headersList.get('cookie');
+  const cookies = cookieHeader?.split(';')
+  const sessionId = cookies?.find(cookie => cookie.includes('session-id='))?.split('=')[1] || '';
+  const cartItemCount = await getCartItemCount(sessionId);
+  console.log('Shopping cart of user', sessionId, 'has', cartItemCount, 'items')
   
   // Function to determine if a link is active
   const isActive = (path: string) => {
     if (path === '/') {
       return pathname === '/';
     }
-    return pathname.startsWith(path);
+    return pathname.endsWith(path);
   };
   
   return (

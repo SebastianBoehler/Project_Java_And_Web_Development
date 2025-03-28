@@ -11,13 +11,8 @@ export interface Product {
     price: number;
     image: string;
     description: string;
-    slug: string;
-    variants: ProductVariant[];
 }
 
-export interface ProductVariant {
-    id: number;
-    name: string;
-    price: number;
-    image: string;
+export interface ShoppingCart {
+    items: {id: number, quantity: number}[]
 }

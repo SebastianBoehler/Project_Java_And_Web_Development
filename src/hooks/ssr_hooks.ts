@@ -1,28 +1,71 @@
 "use server";
 
 import { MongoClient } from "mongodb";
-import { CartItem, Product } from "@/types";
+import { Product, ShoppingCart } from "@/types";
+import { Document } from "mongodb";
 
 const client = new MongoClient(process.env.MONGO_URL!);
+await client.connect();
 
 /**
  * Get the current shopping cart item count
  */
-export async function getCartItemCount(): Promise<number> {
-  // Temporary implementation with mock data
-  // In a real app, this would fetch from a database or API
-  return 3; // Mock cart count for now
+export async function getCartItemCount(sessionId: string): Promise<number> {
+  const db = client.db('shop');
+  const cart = await db.collection('cart').findOne<ShoppingCart>({ sessionId });
+  if (!cart) return 0
+  return cart.items.length;
 }
 
 /**
  * Get the current shopping cart items
+ * @param sessionId parsed from cookie
  */
-export async function getCartItems(): Promise<CartItem[]> {
-  // Temporary implementation with mock data
-  return [
-    { id: 1, name: 'Product 1', price: 19.99, quantity: 1 },
-    { id: 2, name: 'Product 2', price: 29.99, quantity: 2 },
+export async function getCartItems(sessionId: string) {
+  const db = client.db('shop');
+  const cart = await db.collection('cart').findOne<ShoppingCart>({ sessionId });
+  if (!cart) return [];
+
+  const pipeline: Document[] = [
+    //products with matching ids
+    { $match: { id: { $in: cart.items.map(item => item.id) } } },
+    { $project: { _id: 0 } },
   ];
+
+  const products = await db.collection('products')
+    .aggregate<Product>(pipeline)
+    .toArray();
+
+  // add quantity from cart
+  return products.map(product => ({
+    ...product,
+    quantity: cart.items.find(item => item.id === product.id)?.quantity || 0
+  }));
+}
+
+export async function addProductToCart(sessionId: string, productId: number, quantity: number) {
+  const db = client.db('shop');
+  const cart = await db.collection('cart').findOne<ShoppingCart>({ sessionId });
+  console.log('logging cart', cart)
+
+  if (!cart) {
+    await db.collection('cart').insertOne({ sessionId, items: [{ id: productId, quantity }] });
+  } else {
+    //check if item already in cart, increase quantity
+    const item = cart.items.find(item => item.id === productId);
+    console.log('item already in cart', item)
+    if (item) {
+      item.quantity += quantity;
+    } else {
+      cart.items.push({ id: productId, quantity });
+    }
+    await db.collection('cart').updateOne({ sessionId }, { $set: { items: cart.items } });
+  }
+}
+
+export async function emptyCart(sessionId: string) {
+  const db = client.db('shop');
+  await db.collection('cart').deleteOne({ sessionId });
 }
 
 export async function isAuthenticated(): Promise<boolean> {
@@ -30,38 +73,38 @@ export async function isAuthenticated(): Promise<boolean> {
   return false;
 }
 
-export async function getProducts(): Promise<Product[]> {
-  await client.connect();
+export async function getProducts(limit?: number): Promise<Product[]> {
   const db = client.db('shop');
+
+  const pipeline: Document[] = [
+    { $project: { _id: 0 } },
+  ];
+
+  if (limit) {
+    pipeline.push({ $limit: limit });
+  }
+
   const products = await db.collection('products')
-    .find({})
-    .project<Product>({ _id: 0 })
+    .aggregate<Product>(pipeline)
     .toArray();
-  await client.close();
   return products;
 }
 
 export async function getProductByID(id: number): Promise<Product | null> {
-  await client.connect();
   const db = client.db('shop');
   const product = await db.collection('products')
     .findOne<{_id?: number} & Product>({ id });
-  await client.close();
   if (product) delete product._id;
   return product;
 }
 
 export async function saveProduct(product: Product): Promise<void> {
-  await client.connect();
   const db = client.db('shop');
   await db.collection('products').insertOne(product);
-  await client.close();
 }
 
 export async function deleteProduct(id: number): Promise<void> {
-  await client.connect();
   const db = client.db('shop');
   await db.collection('products').deleteOne({ id });
-  await client.close();
 }
   

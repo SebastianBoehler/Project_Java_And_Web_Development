@@ -23,6 +23,7 @@ export default function CreateProductPage() {
 
     setIsLoading(true);
     setError("");
+    setPreviewProduct(null);
     
     try {
       const response = await fetch("/api/products", {

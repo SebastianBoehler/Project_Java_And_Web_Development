@@ -3,12 +3,14 @@
 import { useSidebar } from "@/context/SidebarContext";
 import { CartItem } from "@/types";
 import { useEffect, useRef } from "react";
+import EmptyCardButton from "./EmptyCardButton";
 
 interface CartSidebarProps {
   cartItems: CartItem[];
+  sessionId: string;
 }
 
-export default function CartSidebar({ cartItems }: CartSidebarProps) {
+export default function CartSidebar({ cartItems, sessionId }: CartSidebarProps) {
   const { isSidebarOpen, closeSidebar } = useSidebar();
   const sidebarRef = useRef<HTMLDivElement>(null);
 
@@ -90,6 +92,10 @@ export default function CartSidebar({ cartItems }: CartSidebarProps) {
                 ))}
               </ul>
             )}
+          </div>
+
+          <div className="flex justify-center mb-4 text-center text-text-light-secondary dark:text-text-dark-secondary">
+            <EmptyCardButton sessionId={sessionId} />
           </div>
           
           {cartItems.length > 0 && (

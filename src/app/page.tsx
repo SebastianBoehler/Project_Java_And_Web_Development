@@ -6,7 +6,7 @@ import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 
 export default async function Home() {
-  const products = await getProducts();
+  const products = await getProducts(3);
   
   return (
     <SidebarProvider>

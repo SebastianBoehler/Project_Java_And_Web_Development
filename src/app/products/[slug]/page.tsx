@@ -1,6 +1,8 @@
 import { getProductByID } from '@/hooks/ssr_hooks';
+import { headers } from 'next/headers';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import AddToCartButton from '@/components/AddToCartButton';
 
 interface ProductPageProps {
   params: {
@@ -12,6 +14,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = params;
   const product = await getProductByID(Number(slug))
   console.log({slug, product})
+
+  const headersList = await headers();
+  const cookieHeader = headersList.get('cookie');
+  const cookies = cookieHeader?.split(';')
+  const sessionId = cookies?.find(cookie => cookie.includes('session-id='))?.split('=')[1] || '';
   
   // If product not found, show 404
   if (!product) {
@@ -51,31 +58,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <p>{product.description}</p>
           </div>
           
-          {/* Variants Dropdown */}
-          {product.variants.length > 0 && (
-            <div className="mb-4">
-              <label htmlFor="variant-select" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Select Variant
-              </label>
-              <select 
-                id="variant-select" 
-                className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                defaultValue=""
-              >
-                <option value="" disabled>Choose a variant</option>
-                {product.variants.map((variant) => (
-                  <option key={variant.id} value={variant.id}>
-                    {variant.name} - ${variant.price.toFixed(2)}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-          
           {/* Add to Cart Button */}
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
-            Add to Cart
-          </button>
+          <AddToCartButton 
+            sessionId={sessionId}
+            productId={product.id}
+          />
         </div>
       </div>
     </div>
