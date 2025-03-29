@@ -25,7 +25,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           {product.image ? (
             <div className="relative w-full h-full max-w-[400px] mx-auto">
               <Image
-                src={product.image}
+                src={`data:image/jpeg;base64,${product.image}`}
                 alt={product.name}
                 fill
                 className="object-contain"

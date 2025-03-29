@@ -58,7 +58,7 @@ export default async function ProductsAdminPage() {
                     {product.image ? (
                       <div className="relative h-16 w-16">
                         <Image
-                          src={product.image}
+                          src={`data:image/jpeg;base64,${product.image}`}
                           alt={product.name}
                           fill
                           className="object-cover rounded"

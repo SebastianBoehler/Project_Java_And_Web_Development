@@ -13,7 +13,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         <div className="relative h-64 bg-gray-200">
           {product.image ? (
             <Image 
-              src={product.image} 
+              src={`data:image/jpeg;base64,${product.image}`} 
               alt={product.name}
               fill
               className="object-cover"

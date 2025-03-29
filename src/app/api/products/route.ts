@@ -73,18 +73,30 @@ export async function POST(request: NextRequest) {
       model: "dall-e-3", 
       prompt: productDetails.imagePrompt,
       size: "1792x1024",
-      quality: "hd",
+      quality: "standard",
       n: 1,
     });
 
     const imageUrl = imageResponse.data[0].url;
+    if (!imageUrl) {
+      return NextResponse.json(
+        { error: "Failed to generate product image" },
+        { status: 500 }
+      );
+    }
+
+    //fetch raw image and save as base64 string
+    console.log("Fetching image...", imageUrl);
+    const imageReq = await fetch(imageUrl);
+    const imageBuffer = await imageReq.arrayBuffer();
+    const image = Buffer.from(imageBuffer).toString('base64');
 
     // Create the product object
     const newProduct: Product = {
       id: Date.now(), // Simple ID generation for demo purposes
       name: productDetails.title,
       price: productDetails.price,
-      image: imageUrl || '',
+      image,
       description: productDetails.description,
     };
 
