@@ -8,6 +8,11 @@ This is my e-commerce project for the "Project: Java and Web Development" course
 - Admin dashboard for inventory management
 - OPEN AI DALL-E for product image generation
 
+## Live Demo
+
+The site is hosted on Vercel and can be accessed at:
+https://project-java-and-web-development.vercel.app/
+
 ## Requirements
 
 - Node.js v14.13.1 or higher (required for `node:crypto` module support)
