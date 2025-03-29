@@ -11,7 +11,7 @@ This is my e-commerce project for the "Project: Java and Web Development" course
 ## Requirements
 
 - Node.js v14.13.1 or higher (required for `node:crypto` module support)
-- Developed on Node.js v23.7.0
+- _(Developed on Node.js v23.7.0)_
 - MongoDB database
 - OpenAI API key
 
