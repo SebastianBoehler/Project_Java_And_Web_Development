@@ -20,6 +20,7 @@ await client.connect();
  * @param sessionId parsed from cookie
  */
 export async function getCartItemCount(sessionId: string): Promise<number> {
+  noStore();
   const db = client.db('shop');
   const cart = await db.collection('cart').findOne<ShoppingCart>({ sessionId });
   if (!cart) return 0
@@ -32,6 +33,7 @@ export async function getCartItemCount(sessionId: string): Promise<number> {
  * @returns array of products with quantity
  */
 export async function getCartItems(sessionId: string) {
+  noStore();
   const db = client.db('shop');
   const cart = await db.collection('cart').findOne<ShoppingCart>({ sessionId });
   if (!cart) return [];
