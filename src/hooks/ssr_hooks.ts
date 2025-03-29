@@ -7,11 +7,17 @@ import { unstable_noStore as noStore } from 'next/cache';
 import crypto from 'crypto';
 import { cookies } from 'next/headers';
 
+/* 
+  Server side hooks, will be executed on the server only because it communicates with the database
+  and verifies admin password these are critical steps that should be protected 
+*/
+
 const client = new MongoClient(process.env.MONGO_URL!);
 await client.connect();
 
 /**
  * Get the current shopping cart item count
+ * @param sessionId parsed from cookie
  */
 export async function getCartItemCount(sessionId: string): Promise<number> {
   const db = client.db('shop');
@@ -23,6 +29,7 @@ export async function getCartItemCount(sessionId: string): Promise<number> {
 /**
  * Get the current shopping cart items
  * @param sessionId parsed from cookie
+ * @returns array of products with quantity
  */
 export async function getCartItems(sessionId: string) {
   const db = client.db('shop');
@@ -46,6 +53,12 @@ export async function getCartItems(sessionId: string) {
   }));
 }
 
+/**
+ * Add a product to the shopping cart
+ * @param sessionId parsed from cookie
+ * @param productId product id
+ * @param quantity quantity of the product
+ */
 export async function addProductToCart(sessionId: string, productId: number, quantity: number) {
   const db = client.db('shop');
   const cart = await db.collection('cart').findOne<ShoppingCart>({ sessionId });
@@ -66,11 +79,21 @@ export async function addProductToCart(sessionId: string, productId: number, qua
   }
 }
 
+/**
+ * Empty the shopping cart
+ * deletes the cart document from the database
+ * @param sessionId parsed from cookie
+ */
 export async function emptyCart(sessionId: string) {
   const db = client.db('shop');
   await db.collection('cart').deleteOne({ sessionId });
 }
 
+/**
+ * Get all products
+ * @param limit optional limit of products to return
+ * @returns array of products
+ */
 export async function getProducts(limit?: number): Promise<Product[]> {
   // needed since otherwise it would be cached, had this issue of not updating shown products
   // on /admin/products
@@ -92,6 +115,11 @@ export async function getProducts(limit?: number): Promise<Product[]> {
   return products;
 }
 
+/**
+ * Get a product by id
+ * @param id product id
+ * @returns product or null if not found
+ */
 export async function getProductByID(id: number): Promise<Product | null> {
   const db = client.db('shop');
   const product = await db.collection('products')
@@ -100,16 +128,29 @@ export async function getProductByID(id: number): Promise<Product | null> {
   return product;
 }
 
+/**
+ * Save a product
+ * @param product product to save
+ */
 export async function saveProduct(product: Product): Promise<void> {
   const db = client.db('shop');
   await db.collection('products').insertOne(product);
 }
 
+/**
+ * Delete a product
+ * @param id product id
+ */
 export async function deleteProduct(id: number): Promise<void> {
   const db = client.db('shop');
   await db.collection('products').deleteOne({ id });
 }
 
+/**
+ * Check if the password is valid
+ * @param hash hashed password
+ * @returns true if the password is valid
+ */
 export async function isValidAdminPassword(hash: string): Promise<boolean> {
   const password = 'password';
   const hashedPassword = crypto.createHash('sha256').update(password).digest('hex');

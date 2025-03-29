@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+//Layout for /admin routes
+
 export default function AdminLayout({
   children,
 }: {

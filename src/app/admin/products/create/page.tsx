@@ -26,6 +26,7 @@ export default function CreateProductPage() {
     setPreviewProduct(null);
     
     try {
+      // showcase client side fetch implementation
       const response = await fetch("/api/products", {
         method: "POST",
         headers: {

@@ -1,6 +1,8 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 
+// middleware is code applies before all request defined in the matcher sections
+
 export function middleware(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-url', request.nextUrl.pathname);
@@ -14,8 +16,6 @@ export function middleware(request: NextRequest) {
   // Protect admin routes
   if (request.nextUrl.pathname.startsWith('/admin')) {
     const adminCookie = request.cookies.get('admin')?.value;
-    
-    // If no admin cookie is present, redirect to login page
     if (!adminCookie) {
       return NextResponse.redirect(new URL('/login', request.url));
     }

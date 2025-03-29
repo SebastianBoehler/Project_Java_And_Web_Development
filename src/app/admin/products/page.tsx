@@ -19,6 +19,9 @@ export default async function ProductsAdminPage() {
           Create New Product
         </Link>
       </div>
+      {/* 
+        Dynamically renders section based on whether products are loaded or not
+      */}
       {products.length === 0 ? (
         <div className="text-center py-10 bg-gray-50 rounded-md">
           <p className="text-gray-600 mb-4">No products found</p>

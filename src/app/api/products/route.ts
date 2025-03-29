@@ -27,6 +27,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    //create OPEN AI output from schema
     const completion = await openai.beta.chat.completions.parse({
       model: "gpt-4o-2024-08-06",
       messages: [

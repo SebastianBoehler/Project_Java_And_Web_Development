@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 
-// Adding Header component to login page
+// Layout for /login routes
+// As page.tsx is client side, moved here to have header ssr
 
 export default function RootLayout({
     children,

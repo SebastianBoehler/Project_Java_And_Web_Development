@@ -1,5 +1,10 @@
 "use client";
 
+/*
+  Must be client side due to useState and useEffect, otherwise the user could
+  not apply sorting
+*/
+
 import { useState, useEffect } from "react";
 import { Product } from "@/types";
 import ProductCard from "@/components/ProductCard";

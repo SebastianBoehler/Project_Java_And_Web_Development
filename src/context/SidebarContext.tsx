@@ -2,7 +2,8 @@
 
 import { createContext, useState, useContext, ReactNode } from 'react';
 
-// Define the shape of the context
+// Client side context to reuse that context across the app
+
 interface SidebarContextType {
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
