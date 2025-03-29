@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import crypto from 'crypto';
 import { isValidAdminPassword } from '@/hooks/ssr_hooks';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
+  const router = useRouter();
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -21,7 +23,7 @@ export default function LoginPage() {
       if (!isValid) {
         throw new Error('Invalid password');
       }
-      window.location.href = '/admin';
+      router.push('/admin');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred during login');
     } finally {

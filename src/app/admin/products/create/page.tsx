@@ -9,6 +9,7 @@ import { Product } from "@/types";
 export default function CreateProductPage() {
   const [prompt, setPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
   const [previewProduct, setPreviewProduct] = useState<Product | null>(null);
   const router = useRouter();
@@ -52,8 +53,15 @@ export default function CreateProductPage() {
 
   const handleSave = async () => {
     if (!previewProduct) return;
-    await saveProduct(previewProduct);
-    router.push("/admin/products");
+    
+    setIsSaving(true);
+    try {
+      await saveProduct(previewProduct);
+      router.push("/admin/products");
+    } catch {
+      setError("Failed to save the product");
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -133,9 +141,10 @@ export default function CreateProductPage() {
               
               <button
                 onClick={handleSave}
-                className="text-black py-2 px-4 rounded-md border-2 border-blue-600 hover:bg-blue-600 hover:text-white"
+                disabled={isSaving}
+                className="text-black py-2 px-4 rounded-md border-2 border-blue-600 hover:bg-blue-600 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Save Product
+                {isSaving ? "Saving..." : "Save Product"}
               </button>
             </div>
           </div>
