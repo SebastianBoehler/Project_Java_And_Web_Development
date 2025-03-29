@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import crypto from 'crypto';
 import { isValidAdminPassword } from '@/hooks/ssr_hooks';
 
@@ -9,7 +8,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,7 +21,7 @@ export default function LoginPage() {
       if (!isValid) {
         throw new Error('Invalid password');
       }
-      router.push('/admin');
+      window.location.href = '/admin';
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred during login');
     } finally {
