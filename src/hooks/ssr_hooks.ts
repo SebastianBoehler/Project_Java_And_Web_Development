@@ -4,6 +4,8 @@ import { MongoClient } from "mongodb";
 import { Product, ShoppingCart } from "@/types";
 import { Document } from "mongodb";
 import { unstable_noStore as noStore } from 'next/cache';
+import crypto from 'node:crypto';
+import { cookies } from 'next/headers';
 
 const client = new MongoClient(process.env.MONGO_URL!);
 await client.connect();
@@ -106,4 +108,22 @@ export async function saveProduct(product: Product): Promise<void> {
 export async function deleteProduct(id: number): Promise<void> {
   const db = client.db('shop');
   await db.collection('products').deleteOne({ id });
+}
+
+export async function isValidAdminPassword(hash: string): Promise<boolean> {
+  const password = 'password';
+  const hashedPassword = crypto.createHash('sha256').update(password).digest('hex');
+  const isValid = hashedPassword === hash;
+  if (isValid) {
+    //set cookie
+    const cookieStore = await cookies();
+    cookieStore.set('admin', 'true', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 60 * 60 //1h
+    });
+  }
+  return isValid;
 }

@@ -11,7 +11,17 @@ export function middleware(request: NextRequest) {
     sessionId = uuidv4();
   }
   
-  // Create response
+  // Protect admin routes
+  if (request.nextUrl.pathname.startsWith('/admin')) {
+    const adminCookie = request.cookies.get('admin')?.value;
+    
+    // If no admin cookie is present, redirect to login page
+    if (!adminCookie) {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+  }
+  
+  // Create response object
   const response = NextResponse.next({
     request: {
       headers: requestHeaders,
