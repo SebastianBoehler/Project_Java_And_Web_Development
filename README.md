@@ -8,6 +8,13 @@ This is my e-commerce project for the "Project: Java and Web Development" course
 - Admin dashboard for inventory management
 - OPEN AI DALL-E for product image generation
 
+## Requirements
+
+- Node.js v14.13.1 or higher (required for `node:crypto` module support)
+- Developed on Node.js v23.7.0
+- MongoDB database
+- OpenAI API key
+
 ## Setup
 
 Getting this up and running is pretty straightforward:
@@ -37,13 +44,14 @@ Getting this up and running is pretty straightforward:
 - MongoDB for database
 - OpenAI for product description and images
 - Tailwind CSS for styling
+- Node.js native crypto module for secure authentication
 
 ## Features
 
 - Responsive design that works on mobile and desktop
 - Real-time inventory updates
 - Session specific shopping cart
-- Admin dashboard
+- Admin dashboard with secure authentication
 - Product description and image generation
 
 ---

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import crypto from 'node:crypto';
+import crypto from 'crypto';
 import { isValidAdminPassword } from '@/hooks/ssr_hooks';
 
 export default function LoginPage() {
@@ -69,7 +69,7 @@ export default function LoginPage() {
                 autoComplete="current-password"
                 required
                 className="relative block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600"
-                placeholder="Admin Password"
+                placeholder="password is 'password'"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />

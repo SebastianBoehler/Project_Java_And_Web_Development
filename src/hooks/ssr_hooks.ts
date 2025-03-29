@@ -4,7 +4,7 @@ import { MongoClient } from "mongodb";
 import { Product, ShoppingCart } from "@/types";
 import { Document } from "mongodb";
 import { unstable_noStore as noStore } from 'next/cache';
-import crypto from 'node:crypto';
+import crypto from 'crypto';
 import { cookies } from 'next/headers';
 
 const client = new MongoClient(process.env.MONGO_URL!);
