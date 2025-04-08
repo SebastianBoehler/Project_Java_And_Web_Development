@@ -214,6 +214,12 @@ export async function deleteProduct(id: number): Promise<void> {
   if (imageError) throw imageError;
 }
 
+/**
+ * Save an image
+ * @param id product id
+ * @param blob image data
+ * @returns public url of the image
+ */
 export async function saveImage(id: number, blob: Buffer): Promise<string> {
   const { data, error } = await supabase.storage
   .from('images')
