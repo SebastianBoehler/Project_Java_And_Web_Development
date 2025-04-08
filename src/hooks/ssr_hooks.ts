@@ -90,6 +90,7 @@ export async function getCartItems(sessionId: string) {
  */
 export async function addProductToCart(sessionId: string, productId: number, quantity: number) {
   //find row with session and product id then update quantity else insert row
+  console.log('Adding product to cart', sessionId, productId, quantity);
   const { data: cart, error } = await supabase
     .from('cart')
     .select()
@@ -104,11 +105,13 @@ export async function addProductToCart(sessionId: string, productId: number, qua
   }
   
   if (!cart) {
-    // insert new row
-    console.log('Inserting new row');
-    await supabase
+    //create rnd id string
+    const id = crypto.randomInt(1000000000).toString();
+    const { data, error } = await supabase
       .from('cart')
-      .insert({ sessionId, productId, quantity });
+      .insert({ id, sessionId, productId, quantity });
+
+    console.log(data, error)
   } else {
     // update existing row
     quantity += cart.quantity;
