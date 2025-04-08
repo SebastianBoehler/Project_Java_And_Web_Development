@@ -1,19 +1,21 @@
 "use server";
 
-import { MongoClient } from "mongodb";
-import { Product, ShoppingCart } from "@/types";
-import { Document } from "mongodb";
+import { Product } from "@/types";
 import { unstable_noStore as noStore } from 'next/cache';
 import crypto from 'crypto';
 import { cookies } from 'next/headers';
+import { createClient } from '@supabase/supabase-js'
+
+// Create a single supabase client for interacting with your database
+const supabaseUrl = process.env.SUPABASE_URL!;
+const supabaseAnonKey = process.env.SUPABASE_KEY!;
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 /* 
   Server side hooks, will be executed on the server only because it communicates with the database
   and verifies admin password these are critical steps that should be protected 
 */
 
-const client = new MongoClient(process.env.MONGO_URL!);
-await client.connect();
 
 /**
  * Get the current shopping cart item count
@@ -21,10 +23,19 @@ await client.connect();
  */
 export async function getCartItemCount(sessionId: string): Promise<number> {
   noStore();
-  const db = client.db('shop');
-  const cart = await db.collection('cart').findOne<ShoppingCart>({ sessionId });
-  if (!cart) return 0
-  return cart.items.length;
+  const { data, error } = await supabase
+    .from('cart')
+    .select()
+    .eq('sessionId', sessionId)
+  
+  if (error) {
+    console.error(error);
+    throw error;
+  }
+
+  const count = data.reduce((acc, item) => acc + item.quantity, 0);
+  
+  return count;
 }
 
 /**
@@ -34,25 +45,41 @@ export async function getCartItemCount(sessionId: string): Promise<number> {
  */
 export async function getCartItems(sessionId: string) {
   noStore();
-  const db = client.db('shop');
-  const cart = await db.collection('cart').findOne<ShoppingCart>({ sessionId });
-  if (!cart) return [];
-
-  const pipeline: Document[] = [
-    //products with matching ids
-    { $match: { id: { $in: cart.items.map(item => item.id) } } },
-    { $project: { _id: 0 } },
-  ];
-
-  const products = await db.collection('products')
-    .aggregate<Product>(pipeline)
-    .toArray();
-
-  // add quantity from cart
-  return products.map(product => ({
-    ...product,
-    quantity: cart.items.find(item => item.id === product.id)?.quantity || 0
+  const { data, error } = await supabase
+    .from('cart')
+    .select()
+    .eq('sessionId', sessionId)
+  
+  if (error) {
+    console.error(error);
+    throw error;
+  }
+  
+  const cart = data.map(item => ({
+    productId: item.productId,
+    quantity: item.quantity
   }));
+
+  if (cart.length) {
+    //get products with those productIds
+    const { data: products, error } = await supabase
+      .from('products')
+      .select()
+      .in('id', cart.map(item => item.productId));
+    
+    if (error) {
+      console.error(error);
+      throw error;
+    }
+    
+    const mapped = products.map(product => ({
+      ...product,
+      quantity: cart.find(item => item.productId === product.id)?.quantity || 0
+    }));
+    return mapped
+  }
+
+  return []
 }
 
 /**
@@ -62,22 +89,34 @@ export async function getCartItems(sessionId: string) {
  * @param quantity quantity of the product
  */
 export async function addProductToCart(sessionId: string, productId: number, quantity: number) {
-  const db = client.db('shop');
-  const cart = await db.collection('cart').findOne<ShoppingCart>({ sessionId });
-  console.log('logging cart', cart)
-
+  //find row with session and product id then update quantity else insert row
+  const { data: cart, error } = await supabase
+    .from('cart')
+    .select()
+    .eq('sessionId', sessionId)
+    .eq('productId', productId)
+    .single();
+  
+  //ignore no rows error
+  if (error && error.code !== 'PGRST116') {
+    console.error(error);
+    throw error;
+  }
+  
   if (!cart) {
-    await db.collection('cart').insertOne({ sessionId, items: [{ id: productId, quantity }] });
+    // insert new row
+    console.log('Inserting new row');
+    await supabase
+      .from('cart')
+      .insert({ sessionId, productId, quantity });
   } else {
-    //check if item already in cart, increase quantity
-    const item = cart.items.find(item => item.id === productId);
-    console.log('item already in cart', item)
-    if (item) {
-      item.quantity += quantity;
-    } else {
-      cart.items.push({ id: productId, quantity });
-    }
-    await db.collection('cart').updateOne({ sessionId }, { $set: { items: cart.items } });
+    // update existing row
+    quantity += cart.quantity;
+    await supabase
+      .from('cart')
+      .update({ quantity })
+      .eq('sessionId', sessionId)
+      .eq('productId', productId);
   }
 }
 
@@ -87,8 +126,15 @@ export async function addProductToCart(sessionId: string, productId: number, qua
  * @param sessionId parsed from cookie
  */
 export async function emptyCart(sessionId: string) {
-  const db = client.db('shop');
-  await db.collection('cart').deleteOne({ sessionId });
+  const { error } = await supabase
+    .from('cart')
+    .delete()
+    .eq('sessionId', sessionId);
+  
+  if (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
 /**
@@ -101,19 +147,16 @@ export async function getProducts(limit?: number): Promise<Product[]> {
   // on /admin/products
   noStore();
   
-  const db = client.db('shop');
-
-  const pipeline: Document[] = [
-    { $project: { _id: 0 } },
-  ];
-
-  if (limit) {
-    pipeline.push({ $limit: limit });
+  const { data: products, error } = await supabase
+    .from('products')
+    .select()
+    .order('id', { ascending: true })
+    .limit(limit ?? 100);
+  
+  if (error) {
+    console.error(error);
+    throw error;
   }
-
-  const products = await db.collection('products')
-    .aggregate<Product>(pipeline)
-    .toArray();
   return products;
 }
 
@@ -123,10 +166,16 @@ export async function getProducts(limit?: number): Promise<Product[]> {
  * @returns product or null if not found
  */
 export async function getProductByID(id: number): Promise<Product | null> {
-  const db = client.db('shop');
-  const product = await db.collection('products')
-    .findOne<{_id?: number} & Product>({ id });
-  if (product) delete product._id;
+  const { data: product, error } = await supabase
+    .from('products')
+    .select()
+    .eq('id', id)
+    .single();
+  
+  if (error) {
+    console.error(error);
+    throw error;
+  }
   return product;
 }
 
@@ -135,8 +184,14 @@ export async function getProductByID(id: number): Promise<Product | null> {
  * @param product product to save
  */
 export async function saveProduct(product: Product): Promise<void> {
-  const db = client.db('shop');
-  await db.collection('products').insertOne(product);
+  const { error } = await supabase
+    .from('products')
+    .insert(product);
+  
+  if (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
 /**
@@ -144,8 +199,43 @@ export async function saveProduct(product: Product): Promise<void> {
  * @param id product id
  */
 export async function deleteProduct(id: number): Promise<void> {
-  const db = client.db('shop');
-  await db.collection('products').deleteOne({ id });
+  console.log('Deleting product:', id);
+  const { error } = await supabase
+    .from('products')
+    .delete()
+    .eq('id', id);
+  if (error) throw error;
+
+  //delete image
+  const { error: imageError } = await supabase
+    .storage
+    .from('images')
+    .remove([`products/${id}`]);
+  if (imageError) throw imageError;
+}
+
+export async function saveImage(id: number, blob: Buffer): Promise<string> {
+  const { data, error } = await supabase.storage
+  .from('images')
+  .upload(`products/${id}`, blob, {
+    cacheControl: '3600',
+    upsert: false
+  })
+
+  if (error) {
+    console.error('Upload error:', error)
+    throw error;
+  } else {
+    console.log('Uploaded:', data)
+
+    // Save the path (data.path) in your products table
+    const publicUrl = supabase.storage
+      .from('images')
+      .getPublicUrl(data.path)
+
+    console.log('Public URL:', publicUrl.data.publicUrl)
+    return publicUrl.data.publicUrl;
+  }
 }
 
 /**

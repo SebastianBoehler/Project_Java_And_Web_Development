@@ -3,6 +3,7 @@ import OpenAI from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";
 import { z } from "zod";
 import { Product } from "@/types";
+import { saveImage } from "@/hooks/ssr_hooks";
 
 // Initialize OpenAI client
 const openai = new OpenAI();
@@ -89,14 +90,17 @@ export async function POST(request: NextRequest) {
     console.log("Fetching image...", imageUrl);
     const imageReq = await fetch(imageUrl);
     const imageBuffer = await imageReq.arrayBuffer();
-    const image = Buffer.from(imageBuffer).toString('base64');
+    const buffer = Buffer.from(imageBuffer);
+    const id = Date.now();
+
+    const url = await saveImage(id, buffer);
 
     // Create the product object
     const newProduct: Product = {
-      id: Date.now(), // Simple ID generation for demo purposes
+      id,
       name: productDetails.title,
       price: productDetails.price,
-      image,
+      image: url,
       description: productDetails.description,
     };
 

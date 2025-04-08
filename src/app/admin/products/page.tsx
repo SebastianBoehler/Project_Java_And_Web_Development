@@ -58,12 +58,11 @@ export default async function ProductsAdminPage() {
                     {product.image ? (
                       <div className="relative h-16 w-16">
                         <Image
-                          src={`data:image/jpeg;base64,${product.image}`}
+                          src={product.image}
                           alt={product.name}
                           fill
                           className="object-cover rounded"
                           sizes="64px"
-                          unoptimized={product.image.startsWith('http')}
                         />
                       </div>
                     ) : (

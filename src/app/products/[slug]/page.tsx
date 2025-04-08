@@ -7,7 +7,6 @@ import { cookies } from 'next/headers'
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const product = await getProductByID(Number(slug))
-  console.log({slug, product})
 
   const cookieStore = await cookies();
   const sessionId = cookieStore.get('session-id')?.value || '';
@@ -25,7 +24,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           {product.image ? (
             <div className="relative w-full h-full max-w-[400px] mx-auto">
               <Image
-                src={`data:image/jpeg;base64,${product.image}`}
+                src={product.image}
                 alt={product.name}
                 fill
                 className="object-contain"

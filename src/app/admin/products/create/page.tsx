@@ -119,12 +119,11 @@ export default function CreateProductPage() {
               {previewProduct.image ? (
                 <div className="relative w-full h-80">
                   <Image 
-                    src={`data:image/jpeg;base64,${previewProduct.image}`} 
+                    src={previewProduct.image} 
                     alt={previewProduct.name}
                     fill
                     className="object-contain rounded-md"
                     sizes="(max-width: 768px) 100vw, 50vw"
-                    unoptimized={previewProduct.image.startsWith('http')}
                   />
                 </div>
               ) : (
