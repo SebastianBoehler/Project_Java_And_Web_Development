@@ -18,8 +18,6 @@ export default function DeleteProductButton({ productId }: DeleteProductButtonPr
     setIsDeleting(true);
     
     try {
-      // In a real app, this would call an API endpoint to delete the product
-      // For now, we'll just show a success message
       console.log('Deleting product with ID:',productId)
       await deleteProduct(productId)
       

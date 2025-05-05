@@ -104,8 +104,6 @@ export async function POST(request: NextRequest) {
       description: productDetails.description,
     };
 
-    // In a real application, you would save this to a database
-    // For now, we'll just return the created product
     return NextResponse.json({ product: newProduct }, { status: 201 });
   } catch (error) {
     console.error("Error creating product:", error);
