@@ -10,8 +10,7 @@ export default async function Header() {
   // Get cart count from SSR hook
   
   // Get the current path from headers
-  const cookieStore = await cookies();
-  const headersList = await headers();
+  const [cookieStore, headersList] = await Promise.all([cookies(), headers()]);
   const pathname = headersList.get('x-url') || '/';
 
 
